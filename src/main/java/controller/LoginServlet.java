@@ -24,19 +24,22 @@ public class LoginServlet extends HttpServlet {
         // Dati di connessione al vostro DB locale (modificate se avete credenziali diverse)
         String dbUrl = "jdbc:mysql://localhost:3306/fishing_lab_db?useSSL=false&serverTimezone=UTC";
         String dbUser = "root";
-        String dbPass = "root"; // Mettete la vostra password di MySQL locale
+        String dbPass = "Sonogiuseppe2005."; // Mettete la vostra password di MySQL locale
         
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         
+        
         try {
-            // Carichiamo il driver MySQL
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            // Registrazione esplicita del driver (quella che ha sbloccato la connessione)
+            java.sql.Driver driver = new com.mysql.cj.jdbc.Driver();
+            java.sql.DriverManager.registerDriver(driver);
+            
             conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
             
-            // Query per verificare se esiste l'utente con quella email e password
-            String sql = "SELECT * FROM utente WHERE email = ? AND password = ?";
+            // Query pulita
+            String sql = "SELECT email, ruolo FROM utente WHERE email = ? AND password = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, email);
             ps.setString(2, password);
@@ -44,32 +47,38 @@ public class LoginServlet extends HttpServlet {
             rs = ps.executeQuery();
             
             if (rs.next()) {
-                // LOGIN SUCCESSO: L'utente esiste!
-                // Creiamo la sessione e salviamo il nome dell'utente
+                // LOGIN COINCIDE -> Salviamo i dati in sessione
                 HttpSession session = request.getSession();
-                session.setAttribute("utenteNome", rs.getString("nome"));
-                session.setAttribute("utenteRuolo", rs.getString("ruolo"));
-                session.setAttribute("utenteEmail", rs.getString("email"));
                 
-                // Reindirizziamo l'utente alla home page (index.jsp)
-                response.sendRedirect("index.jsp");
+                // Usiamo l'estrazione sicura tramite stringa
+                session.setAttribute("utenteEmail", rs.getString("email"));
+                session.setAttribute("utenteRuolo", rs.getString("ruolo"));
+                
+                // Mandiamo alla index dentro WEB-INF (usando il forward funzionante)
+                request.getRequestDispatcher("/WEB-INF/view/index.jsp").forward(request, response);
+                return; // Interrompe il metodo ed evita che il codice sotto interferisca
+                
             } else {
-                // LOGIN FALLITO: Credenziali errate
+                // Credenziali sbagliate
                 request.setAttribute("errore", "Email o Password errate!");
                 request.getRequestDispatcher("login.jsp").forward(request, response);
+                return;
             }
             
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errore", "Errore del server durante il login.");
+            // Questo ti stamperà in rosso l'esatto motivo per cui "sembra disconnettersi"
+            System.out.println("❌ ERRORE DURANTE LA QUERY/FORWARD:");
+            e.printStackTrace(); 
+            
+            request.setAttribute("errore", "Errore interno: " + e.getMessage());
             request.getRequestDispatcher("login.jsp").forward(request, response);
         } finally {
-            // Chiudiamo le risorse del DB
+            // La connessione DEVE chiudersi solo qui, alla fine di tutto il processo
             try { if (rs != null) rs.close(); } catch (Exception e) {}
             try { if (ps != null) ps.close(); } catch (Exception e) {}
             try { if (conn != null) conn.close(); } catch (Exception e) {}
         }
-    }
+        }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Se qualcuno prova ad accedere via GET, lo rimandiamo semplicemente al form

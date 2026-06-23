@@ -90,7 +90,7 @@
     <% } %>
 
     <%-- Il form punta alla LoginServlet usando il metodo POST --%>
-    <form action="LoginServlet" method="POST">
+    <form action="LoginServlet" method="post">
         <div class="form-group">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" placeholder="Inserisci la tua email" required>
