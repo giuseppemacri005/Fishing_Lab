@@ -96,4 +96,18 @@
             <input type="email" id="email" name="email" placeholder="Inserisci la tua email" required>
         </div>
         
-   
+          
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Inserisci la tua password" required>
+        </div>
+        
+        <button type="submit">Accedi</button>
+    </form>
+    
+    <div class="register-link">
+        Non hai un account? <a href="registrazione.jsp">Registrati qui</a>
+    </div>
+</div>
+
+</body>
