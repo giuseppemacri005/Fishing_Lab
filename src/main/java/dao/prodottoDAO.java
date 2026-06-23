@@ -26,7 +26,7 @@ public class prodottoDAO {
             System.err.println("Errore JNDI durante l'inizializzazione del DataSource: " + e.getMessage());
         }
     }
-
+     // questo è un commento 
     /**
      * Recupera tutti i prodotti attivi dal database ordinandoli per inserimento.
      * Include la cancellazione logica richiesta: i prodotti con Attivo = 0 rimangono 
