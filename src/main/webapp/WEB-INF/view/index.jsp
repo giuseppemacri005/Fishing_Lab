@@ -15,7 +15,6 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" style="border-bottom: 3px solid #0d6efd;">
         <div class="container">
-         
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
@@ -118,4 +117,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
