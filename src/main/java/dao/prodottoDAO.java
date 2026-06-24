@@ -6,54 +6,74 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
 import model.Prodotto;
+import dao.connessione; 
 
 public class prodottoDAO {
 
-    private static DataSource ds;
-
-    // Il blocco statico aggancia il DataSource all'avvio del server tramite JNDI
-    static {
-        try {
-            Context initCtx = new InitialContext();
-            Context envCtx = (Context) initCtx.lookup("java:comp/env");
-            ds = (DataSource) envCtx.lookup("jdbc/fishing_lab_db");
-        } catch (NamingException e) {
-            System.err.println("Errore JNDI durante l'inizializzazione del DataSource: " + e.getMessage());
-        }
-    }
-     // questo è un commento 
-    /**
-     * Recupera tutti i prodotti attivi dal database ordinandoli per inserimento.
-     * Include la cancellazione logica richiesta: i prodotti con Attivo = 0 rimangono 
-     * archiviati per gli ordini storici ma non compaiono nel catalogo pubblico.
-     */
     public List<Prodotto> doRetrieveAll() throws SQLException {
-        List<Prodotto> listaProdotti = new ArrayList<>();
+        List<Prodotto> prodotti = new ArrayList<>();
+        String sql = "SELECT * FROM prodotto";
         
-        // Eseguiamo una JOIN per estrarre direttamente il nome del Brand associato
-        String query = "SELECT P.*, B.Nome_Brand FROM PRODOTTO P JOIN BRAND B ON P.ID_Brand = B.ID_Brand WHERE P.Attivo = 1 ORDER BY P.IdProdotto";
-        try (Connection con = ds.getConnection(); 
-             PreparedStatement ps = con.prepareStatement(query); 
+        try (Connection con = connessione.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-
+            
             while (rs.next()) {
-                Prodotto prodotto = new Prodotto();
-                prodotto.setIdProdotto(rs.getInt("IdProdotto")); // Nota: IdProdotto
-                prodotto.setNomeProdotto(rs.getString("NomeProdotto")); // Nota: NomeProdotto
-                prodotto.setDescrizione(rs.getString("Descrizione"));
-                prodotto.setPrezzoOriginale(rs.getDouble("PrezzoOriginale"));
-                prodotto.setPrezzoScontato(rs.getDouble("PrezzoScontato"));
-                prodotto.setNomeBrand(rs.getString("Nome_Brand")); // Nota: Nome_Brand (dalla tabella BRAND)
-                prodotto.setImmagine(rs.getString("Immagine"));
-                
-                listaProdotti.add(prodotto);
+                prodotti.add(mapRowToProdotto(rs));
             }
         }
-        return listaProdotti;
+        return prodotti;
+    }
+
+    public Prodotto doRetrieveByKey(int id) throws SQLException {
+        // Aggiornato con il nome colonna corretto idProdotto
+        String sql = "SELECT * FROM prodotto WHERE idProdotto = ?";
+        
+        try (Connection con = connessione.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToProdotto(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Prodotto> doSearch(String query) throws SQLException {
+        List<Prodotto> prodotti = new ArrayList<>();
+        // Aggiornato con i nomi colonna corretti NomeProdotto e Descrizione
+        String sql = "SELECT * FROM prodotto WHERE NomeProdotto LIKE ? OR Descrizione LIKE ?";
+        
+        try (Connection con = connessione.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            String searchPattern = "%" + query + "%";
+            ps.setString(1, searchPattern);
+            ps.setString(2, searchPattern);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    prodotti.add(mapRowToProdotto(rs));
+                }
+            }
+        }
+        return prodotti;
+    }
+
+    private Prodotto mapRowToProdotto(ResultSet rs) throws SQLException {
+        Prodotto p = new Prodotto();
+        
+        // Mappatura esatta basata sui nomi reali nel tuo database
+        p.setIdProdotto(rs.getInt("idProdotto"));             
+        p.setNomeProdotto(rs.getString("NomeProdotto"));      
+        p.setDescrizione(rs.getString("Descrizione"));
+        p.setPrezzoScontato(rs.getDouble("PrezzoScontato"));  
+        p.setImmagine(rs.getString("Immagine"));      
+        
+        return p;
     }
 }
