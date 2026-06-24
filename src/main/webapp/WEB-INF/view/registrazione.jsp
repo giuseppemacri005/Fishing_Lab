@@ -1,194 +1,95 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrazione - ShopOnline</title>
+    <title>Fishing Lab - Registrazione</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: linear-gradient(180deg, #001f3f 0%, #004080 50%, #0066cc 100%);
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            margin: 0;
         }
-
-        .register-container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        .wave-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            z-index: 10;
+            width: 420px;
+        }
+        .ocean-waves {
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            max-width: 450px;
+            height: 250px;
+            z-index: 1;
+            pointer-events: none;
         }
-
-        .register-container h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
+        .wave {
+            animation: wave-anim 12s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
         }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus {
-            border-color: #007bff;
-            outline: none;
-        }
-
-        .btn-register {
-            width: 100%;
-            padding: 12px;
-            background-color: #28a745;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 10px;
-        }
-
-        .btn-register:hover {
-            background-color: #218838;
-        }
-
-        .alert {
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .login-link a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
+        @keyframes wave-anim {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
     </style>
 </head>
 <body>
 
-<div class="register-container">
-    <h2>Crea il tuo Account</h2>
+<div class="card p-4 shadow-lg wave-card">
+    <h3 class="text-center mb-4 fw-bold" style="color: #001f3f;">Crea un Account</h3>
+    
+    <% if (request.getAttribute("errore") != null) { %>
+        <div class="alert alert-danger p-2 text-center" style="background-color: #FF4136; color: white; border: none;">
+            <%= request.getAttribute("errore") %>
+        </div>
+    <% } %>
 
-    <%-- Gestione dei messaggi di errore o successo inviati dalla Servlet --%>
-    <% 
-        String errore = (String) request.getAttribute("errore");
-        String successo = (String) request.getAttribute("successo");
-        if (errore != null) { 
-    %>
-        <div class="alert alert-danger"><%= errore %></div>
-    <%  } 
-        if (successo != null) { 
-    %>
-        <div class="alert alert-success"><%= successo %></div>
-    <%  } %>
-
-    <%-- Il form punta alla servlet che gestirà la logica di registrazione (es. RegistrazioneServlet) --%>
-    <form action="RegistrazioneServlet" method="POST" onsubmit="return validaForm()">
+    <form id="registerForm" action="${pageContext.request.contextPath}/RegistrazioneServlet" method="POST">
+        <div class="mb-3">
+            <label for="nome" class="form-label fw-semibold" style="color: #001f3f;">Nome</label>
+            <input type="text" class="form-control" id="nome" name="nome" required>
+        </div>
+        <div class="mb-3">
+            <label for="cognome" class="form-label fw-semibold" style="color: #001f3f;">Cognome</label>
+            <input type="text" class="form-control" id="cognome" name="cognome" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label fw-semibold" style="color: #001f3f;">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label fw-semibold" style="color: #001f3f;">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
         
-        <div class="form-group">
-            <label for="nome">Nome</label>
-            <input type="text" id="nome" name="nome" required placeholder="Inserisci il tuo nome">
+        <button type="submit" class="btn w-100 text-white mb-3 fw-bold" style="background-color: #001f3f;">Registrati</button>
+        
+        <div class="text-center">
+            <span class="text-muted small">Hai già un account?</span>
+            <a href="${pageContext.request.contextPath}/LoginServlet" class="small fw-bold text-decoration-none" style="color: #004080;"> Accedi qui</a>
         </div>
-
-        <div class="form-group">
-            <label for="cognome">Cognome</label>
-            <input type="text" id="cognome" name="cognome" required placeholder="Inserisci il tuo cognome">
-        </div>
-
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required placeholder="esempio@email.com">
-        </div>
-
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required placeholder="Almeno 8 caratteri">
-        </div>
-
-        <div class="form-group">
-            <label for="confermaPassword">Conferma Password</label>
-            <input type="password" id="confermaPassword" name="confermaPassword" required placeholder="Ripeti la password">
-        </div>
-
-        <button type="submit" class="btn-register">Registrati</button>
     </form>
-
-    <div class="login-link">
-        Hai già un account? <a href="login.jsp">Accedi qui</a>
-    </div>
 </div>
 
-<script>
-    // Semplice controllo lato client prima dell'invio del form
-    function validaForm() {
-        const password = document.getElementById("password").value;
-        const confermaPassword = document.getElementById("confermaPassword").value;
-
-        if (password.length < 8) {
-            alert("La password deve contenere almeno 8 caratteri.");
-            return false;
-        }
-
-        if (password !== confermaPassword) {
-            alert("Le password non corrispondono!");
-            return false;
-        }
-
-        return true;
-    }
-</script>
+<div class="ocean-waves">
+    <svg viewBox="0 24 150 28" preserveAspectRatio="none" style="width: 200%; height: 100%;">
+        <defs>
+            <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s58 18 88 18 58-18 88-18 58 18 88 18v44h-352z" />
+        </defs>
+        <g class="wave"><use href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.3)" /></g>
+        <g class="wave"><use href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.4)" /></g>
+    </svg>
+</div>
 
 </body>
 </html>

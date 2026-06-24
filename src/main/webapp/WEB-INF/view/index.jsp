@@ -291,7 +291,7 @@
         <div class="products-grid">
             <div class="product-card">
                 <div class="product-image">
-                    <img src="canna.jpg" alt="Carbon Raptor">
+                    <img src="canna_carbon" alt="Carbon Raptor">
                     <span class="product-badge">Canne</span>
                 </div>
                 <div class="product-info">
@@ -306,7 +306,7 @@
 
             <div class="product-card">
                 <div class="product-image">
-                    <img src="mulinello.jpg" alt="Poseidon 4000 SW">
+                    <img src="mulinello_Crossfire.jpg" alt="Poseidon 4000 SW">
                     <span class="product-badge">Mulinelli</span>
                 </div>
                 <div class="product-info">
@@ -321,7 +321,7 @@
 
             <div class="product-card">
                 <div class="product-image">
-                    <img src="esca.jpg" alt="Kraken Jerk 120">
+                    <img src="esca_rapala.jpg" alt="Kraken Jerk 120">
                     <span class="product-badge">Esche</span>
                 </div>
                 <div class="product-info">
