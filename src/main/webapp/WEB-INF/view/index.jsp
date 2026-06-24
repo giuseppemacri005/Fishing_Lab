@@ -27,9 +27,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-outline-light btn-sm fw-bold px-3 ms-2" href="login.jsp">
-                            <i class="fa-solid fa-user me-1"></i> Accedi
-                        </a>
+                      <a class="btn btn-outline-light btn-sm fw-bold px-3 ms-2" href="${pageContext.request.contextPath}/LoginServlet">
+    <i class="fa-solid fa-user me-1"></i> Accedi
+</a>
                     </li>
                 </ul>
             </div>
