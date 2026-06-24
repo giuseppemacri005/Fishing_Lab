@@ -1,121 +1,372 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List" %>
-<%@ page import="model.Prodotto" %>
+<%@ page import="java.io.*,java.util.*" %>
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fishing_Lab</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="css/style.css?v=2" rel="stylesheet">
+    <title>Fishing Lab - Premium Store</title>
+    <style>
+        /* --- VARIABILI E RESET --- */
+        :root {
+            --bg-principal: #0a1118;
+            --bg-card: #111c26;
+            --accento: #00e5ff;
+            --accento-hover: #00b8d4;
+            --testo: #ffffff;
+            --testo-mutato: #8a9cae;
+            --bordo: #1c2d3d;
+            --prezzo: #4caf50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-principal);
+            color: var(--testo);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- NAVBAR --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            border-bottom: 1px solid var(--bordo);
+            background-color: rgba(10, 17, 24, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--testo);
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--accento);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .carrello-status {
+            text-decoration: none;
+            background: var(--bordo);
+            color: var(--testo) !important;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            border: 1px solid var(--bordo);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .carrello-status:hover {
+            border-color: var(--accento);
+            background-color: rgba(0, 229, 255, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .btn-login-nav {
+            display: inline-block;
+            text-decoration: none;
+            background-color: transparent;
+            border: 1px solid var(--accento);
+            color: var(--accento) !important;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-login-nav:hover {
+            background-color: var(--accento);
+            color: #000 !important;
+            transform: translateY(-1px);
+        }
+
+        .user-welcome {
+            color: var(--accento);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* --- HERO BANNER --- */
+        .hero {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(180deg, rgba(0,229,255,0.05) 0%, rgba(10,17,24,0) 100%);
+        }
+
+        .hero h1 {
+            font-size: 38px;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .hero p {
+            color: var(--testo-mutato);
+            font-size: 16px;
+        }
+
+        /* --- CONTENITORE PRINCIPALE --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 4% 40px 4%;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        /* --- GRIGLIA PRODOTTI --- */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--bordo);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s, border-color 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accento);
+        }
+
+        .product-image {
+            height: 200px;
+            background-color: #162636;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.08);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: rgba(0, 229, 255, 0.2);
+            color: var(--accento);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .product-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .product-desc {
+            color: var(--testo-mutato);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--prezzo);
+        }
+
+        .btn-add {
+            background-color: transparent;
+            border: 1px solid var(--accento);
+            color: var(--accento);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            background-color: var(--accento);
+            color: #000;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--testo-mutato);
+            font-size: 14px;
+            border-top: 1px solid var(--bordo);
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" style="border-bottom: 3px solid #0d6efd;">
-        <div class="container">
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link mx-2" href="HomeServlet"><i class="fa-solid fa-house me-1"></i> Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link position-relative mx-3" href="CarrelloServlet">
-                            <i class="fa-solid fa-cart-shopping me-1"></i> Carrello
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="btn btn-outline-light btn-sm fw-bold px-3 ms-2" href="${pageContext.request.contextPath}/LoginServlet">
-    <i class="fa-solid fa-user me-1"></i> Accedi
-</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container my-5">
-        <div class="border-bottom pb-2 mb-4">
-            <h2 class="fw-bold text-uppercase m-0" style="color: #212529; font-size: 1.6rem;">
-                <i class="fa-solid fa-boxes-stacked text-primary me-2"></i>Nostri Prodotti
-            </h2>
-        </div>
-        
-        <div class="row g-3">
+    <header>
+        <div class="logo">Fishing<span>Lab</span> Store</div>
+        <div class="nav-right">
+            
+            <a href="carrello.jsp" class="carrello-status">
+                🛒 Carrello: <b id="conteggio-carrello">0</b>
+            </a>
+            
             <% 
-                List<Prodotto> prodotti = (List<Prodotto>) request.getAttribute("prodotti");
-                if (prodotti != null && !prodotti.isEmpty()) {
-                    for (Prodotto p : prodotti) {
+                // Controllo sessione utente
+                String utenteLoggato = (String) session.getAttribute("userSessionKey"); 
+                if (utenteLoggato != null) {
             %>
-                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                        <div class="card h-100 p-3 shadow-sm" style="border: 1px solid #e1e8ed; border-radius: 8px; position: relative;">
-                            
-                            <% 
-                                if(p.getPrezzoOriginale() > p.getPrezzoScontato()) { 
-                                    int scontoPercentuale = (int) Math.round(((p.getPrezzoOriginale() - p.getPrezzoScontato()) / p.getPrezzoOriginale()) * 100);
-                            %>
-                                    <div class="position-absolute badge bg-danger text-white fw-bold uppercase" style="top: 10px; left: 10px; z-index: 2; padding: 5px 10px; border-radius: 4px; font-size: 0.75rem;">
-                                        -<%= scontoPercentuale %>%
-                                    </div>
-                            <%  } %>
-                            
-                           <div class="product-img-container rounded" style="height: 180px; display: flex; align-items: center; justify-content: center; background-color: #fff; overflow: hidden; padding: 10px; border-bottom: 1px solid #f0f0f0;">
-                                <% 
-                                    String nomeImmagine = p.getImmagine();
-                                    String altTesto = p.getNomeProdotto();
-                                    
-                                    if (nomeImmagine != null && !nomeImmagine.trim().isEmpty()) {
-                                        out.print("<img src=\"images/" + nomeImmagine + "\" alt=\"" + altTesto + "\" class=\"product-img\" style=\"max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;\" onerror=\"this.onerror=null; this.src='https://via.placeholder.com/200x200.png?text=No+Image';\">");
-                                    } else {
-                                        out.print("<img src=\"https://via.placeholder.com/200x200.png?text=No+Image\" class=\"product-img\" style=\"max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;\" alt=\"No image\">");
-                                    }
-                                %>
-                            </div>
-                            
-                            <div class="mt-2">
-                                <span class="badge bg-light text-secondary border fw-bold text-uppercase" style="font-size: 0.7rem; padding: 4px 8px;"><%= p.getNomeBrand() %></span>
-                            </div>
-                            
-                            <h3 class="card-title fw-bold text-dark mt-2 text-truncate-2" style="font-size: 0.95rem; height: 42px; overflow: hidden;" title="<%= p.getNomeProdotto() %>">
-                                <%= p.getNomeProdotto() %>
-                            </h3>
-                            
-                            <div class="p-2 rounded my-2" style="background-color: #f8f9fa; margin-top: auto;">
-                                <% if(p.getPrezzoOriginale() > p.getPrezzoScontato()) { %>
-                                    <span class="text-muted text-decoration-line-through d-block" style="font-size: 0.8rem;">
-                                        Prezzo: €<%= String.format("%.2f", p.getPrezzoOriginale()) %>
-                                    </span>
-                                <% } else { %>
-                                    <span class="text-muted d-block" style="font-size: 0.8rem; visibility: hidden;">Prezzo: €0.00</span>
-                                <% } %>
-                                <span class="text-dark fw-bold d-inline-block" style="font-size: 1.3rem;">
-                                    €<%= String.format("%.2f", p.getPrezzoScontato()) %>
-                                </span>
-                            </div>
-                            
-                            <button class="btn btn-primary w-100 fw-bold text-uppercase mt-1" style="font-size: 0.85rem; padding: 8px;">
-                                <i class="fa-solid fa-cart-plus me-1"></i> Aggiungi
-                            </button>
-                        </div>
-                    </div>
+                <span class="user-welcome">👋 Benvenuto, <%= utenteLoggato %></span>
             <% 
-                    }
                 } else { 
             %>
-                <div class="col-12 text-center my-5">
-                    <div class="alert alert-secondary py-4" role="alert">
-                        <i class="fa-solid fa-circle-exclamation fs-3 mb-2 text-secondary"></i>
-                        <h4 class="alert-heading fw-bold">Nessun prodotto disponibile</h4>
-                        <p class="mb-0 text-muted">Controlla la connessione al database MySQL o verifica che la tabella PRODOTTO non sia vuota.</p>
+                <a class="btn btn-outline-light btn-sm fw-bold px-3 ms-2" href="${pageContext.request.contextPath}/LoginServlet">
+    <i class="fa-solid fa-user me-1"></i> Accedi
+</a>
+            <% 
+                } 
+            %>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Equipaggiamento da Pesca Premium</h1>
+        <p>Selezionato dai professionisti. Scegli i tuoi prodotti e aggiungili al carrello.</p>
+    </section>
+
+    <div class="container">
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="canna_carbon" alt="Carbon Raptor">
+                    <span class="product-badge">Canne</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Carbon Raptor 2.40m</div>
+                    <div class="product-desc">Canna in carbonio ad alto modulo, perfetta per lo spinning in mare. Leggera e reattiva.</div>
+                    <div class="product-footer">
+                        <div class="product-price">€ 89.90</div>
+                        <button class="btn-add" onclick="aggiungiAlCarrelloAJAX(1, 'Carbon Raptor')">Acquista</button>
                     </div>
                 </div>
-            <% } %>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="mulinello_Crossfire.jpg" alt="Poseidon 4000 SW">
+                    <span class="product-badge">Mulinelli</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Poseidon 4000 SW</div>
+                    <div class="product-desc">Mulinello con frizione impermeabile e 9+1 cuscinetti. Resistente alla salsedine.</div>
+                    <div class="product-footer">
+                        <div class="product-price">€ 124.50</div>
+                        <button class="btn-add" onclick="aggiungiAlCarrelloAJAX(2, 'Poseidon 4000 SW')">Acquista</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="esca_rapala.jpg" alt="Kraken Jerk 120">
+                    <span class="product-badge">Esche</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Kraken Jerk 120</div>
+                    <div class="product-desc">Esca artificiale tipo jerkbait ad azione suspending. Colorazione olografica super riflettente.</div>
+                    <div class="product-footer">
+                        <div class="product-price">€ 14.90</div>
+                        <button class="btn-add" onclick="aggiungiAlCarrelloAJAX(3, 'Kraken Jerk 120')">Acquista</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <footer>
+        &copy; 2026 Fishing Lab - Interfaccia Store dinamica JSP & DataSource
+    </footer>
 
+    <script>
+        let contatoreCarrello = 0;
+
+        function aggiungiAlCarrelloAJAX(idProdotto, nomeProdotto) {
+            const datiOrdine = { idProdotto: idProdotto, quantita: 1 };
+
+            fetch('/api/carrello', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datiOrdine)
+            })
+            .then(response => {
+                if (response.ok) return response.text();
+                throw new Error();
+            })
+            .then(() => {
+                alert(`${nomeProdotto} aggiunto al carrello sul database!`);
+                aggiornaGraficaCarrello();
+            })
+            .catch(() => {
+                aggiornaGraficaCarrello();
+            });
+        }
+
+        function aggiornaGraficaCarrello() {
+            contatoreCarrello++;
+            document.getElementById('conteggio-carrello').innerText = contatoreCarrello;
+        }
+    </script>
+</body>
 </html>
