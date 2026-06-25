@@ -27,6 +27,7 @@
 <%
     List<Prodotto> carrello = (List<Prodotto>) session.getAttribute("carrello");
     int count = (carrello != null) ? carrello.size() : 0;
+    String utenteEmail = (String) session.getAttribute("utenteEmail");
 %>
 
 <div class="aquarium">
@@ -35,17 +36,23 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark glass-nav sticky-top" style="z-index: 100;">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="${pageContext.request.contextPath}/HomeServlet">Fishing Lab 🎣</a>
+      <a class="navbar-brand fw-bold" href="${pageContext.request.contextPath}/home">Fishing Lab 🎣</a>
 
 <form class="d-flex mx-auto" action="${pageContext.request.contextPath}/CercaServlet" method="GET" style="width: 100%; max-width: 400px;">
     <input class="form-control me-2" type="search" name="ricerca" placeholder="Cerca attrezzatura...">
     <button class="btn btn-outline-light" type="submit">🔍</button>
 </form>
-        <div class="navbar-nav">
+        <div class="navbar-nav align-items-center">
             <a class="nav-link text-white position-relative" href="#">🛒 Carrello 
                 <% if (count > 0) { %><span class="badge bg-danger rounded-pill"><%= count %></span><% } %>
             </a>
-            <a class="btn btn-outline-light btn-sm ms-3" href="${pageContext.request.contextPath}/LoginServlet">Accedi</a>
+            
+            <% if (utenteEmail != null) { %>
+                <span class="nav-link text-white fw-bold ms-3">Ciao, <%= utenteEmail %></span>
+                <a class="btn btn-outline-danger btn-sm ms-3" href="${pageContext.request.contextPath}/LogoutServlet">Logout</a>
+            <% } else { %>
+                <a class="btn btn-outline-light btn-sm ms-3" href="${pageContext.request.contextPath}/LoginServlet">Accedi</a>
+            <% } %>
         </div>
     </div>
 </nav>
