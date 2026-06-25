@@ -35,11 +35,12 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark glass-nav sticky-top" style="z-index: 100;">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="${pageContext.request.contextPath}/HomeServlet">Fishing Lab 🎣</a>
-        <form class="d-flex mx-auto" action="${pageContext.request.contextPath}/HomeServlet" method="GET" style="width: 100%; max-width: 400px;">
-            <input class="form-control me-2" type="search" name="cerca" placeholder="Cerca attrezzatura...">
-            <button class="btn btn-outline-light" type="submit">🔍</button>
-        </form>
+      <a class="navbar-brand fw-bold" href="${pageContext.request.contextPath}/HomeServlet">Fishing Lab 🎣</a>
+
+<form class="d-flex mx-auto" action="${pageContext.request.contextPath}/CercaServlet" method="GET" style="width: 100%; max-width: 400px;">
+    <input class="form-control me-2" type="search" name="ricerca" placeholder="Cerca attrezzatura...">
+    <button class="btn btn-outline-light" type="submit">🔍</button>
+</form>
         <div class="navbar-nav">
             <a class="nav-link text-white position-relative" href="#">🛒 Carrello 
                 <% if (count > 0) { %><span class="badge bg-danger rounded-pill"><%= count %></span><% } %>
