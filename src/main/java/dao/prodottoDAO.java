@@ -27,7 +27,6 @@ public class prodottoDAO {
     }
 
     public Prodotto doRetrieveByKey(int id) throws SQLException {
-        // Aggiornato con il nome colonna corretto idProdotto
         String sql = "SELECT * FROM prodotto WHERE idProdotto = ?";
         
         try (Connection con = connessione.getConnection();
@@ -45,7 +44,6 @@ public class prodottoDAO {
 
     public List<Prodotto> doSearch(String query) throws SQLException {
         List<Prodotto> prodotti = new ArrayList<>();
-        // Aggiornato con i nomi colonna corretti NomeProdotto e Descrizione
         String sql = "SELECT * FROM prodotto WHERE NomeProdotto LIKE ? OR Descrizione LIKE ?";
         
         try (Connection con = connessione.getConnection();
@@ -67,7 +65,6 @@ public class prodottoDAO {
     private Prodotto mapRowToProdotto(ResultSet rs) throws SQLException {
         Prodotto p = new Prodotto();
         
-        // Mappatura esatta basata sui nomi reali nel tuo database
         p.setIdProdotto(rs.getInt("idProdotto"));             
         p.setNomeProdotto(rs.getString("NomeProdotto"));      
         p.setDescrizione(rs.getString("Descrizione"));
@@ -75,5 +72,23 @@ public class prodottoDAO {
         p.setImmagine(rs.getString("Immagine"));      
         
         return p;
+    }
+
+    // --- METODO AGGIUNTO PER L'ADMIN: SALVATAGGIO NUOVO PRODOTTO ---
+    public void doSave(Prodotto prodotto) throws SQLException {
+        // Query basata sui nomi reali delle colonne emersi dal tuo mapRowToProdotto
+        // Nota: se nel DB hai anche prezzoOriginale, annoProduzione e nomeBrand, aggiungili qui di seguito
+        String sql = "INSERT INTO prodotto (NomeProdotto, Descrizione, PrezzoScontato, Immagine) VALUES (?, ?, ?, ?)";
+        
+        try (Connection con = connessione.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, prodotto.getNomeProdotto());
+            ps.setString(2, prodotto.getDescrizione());
+            ps.setDouble(3, prodotto.getPrezzoScontato());
+            ps.setString(4, prodotto.getImmagine());
+
+            ps.executeUpdate();
+        }
     }
 }
