@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Utente; 
-import dao.UtenteDao; // Mantenuto UtenteDao con la 'd' minuscola come nel tuo progetto
+import dao.UtenteDao; 
 
 import java.io.IOException;
 import java.sql.SQLException;
