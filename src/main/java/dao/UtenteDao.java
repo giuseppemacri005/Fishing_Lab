@@ -1,4 +1,4 @@
-package dao; 
+package dao;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -9,13 +9,37 @@ import model.Utente;
 
 public class UtenteDao {
     
-    private static final String URL = "jdbc:mysql://localhost:3306/fishing_lab?useSSL=false&serverTimezone=UTC";
+	// Cambia il nome in fishing_lab_db
+	private static final String URL = "jdbc:mysql://localhost:3306/fishing_lab_db?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root";
     private static final String PASSWORD = "Sonogiuseppe2005.";
     
-    // Primo metodo: Salva Utente
+    // Metodo per controllare se l'email esiste già
+    public boolean emailEsistente(String email) throws SQLException {
+        String sql = "SELECT count(*) FROM utente WHERE email = ?";
+        
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+    
+    // Salva Utente
     public boolean salvaUtente(Utente utente) throws SQLException {
-        String query = "INSERT INTO utenti (nome, cognome, email, password) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO utente (nome, cognome, email, password) VALUES (?, ?, ?, ?)";
         
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -36,10 +60,10 @@ public class UtenteDao {
         }
     }
     
-    // Secondo metodo: Check Login (senza la graffa errata prima!)
+    // Check Login
     public Utente checkLogin(String email, String password) throws SQLException {
         Utente utente = null;
-        String query = "SELECT * FROM utenti WHERE email = ? AND password = ?";
+        String query = "SELECT * FROM utente WHERE email = ? AND password = ?";
         
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
