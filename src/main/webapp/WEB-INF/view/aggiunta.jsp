@@ -1,148 +1,246 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*" %>
+<%
+    // Controllo di sicurezza: verifica se l'utente è loggato ed è un amministratore
+    String ruolo = (String) session.getAttribute("utenteRuolo");
+    if (ruolo == null || !ruolo.equalsIgnoreCase("admin")) {
+        // Se non è admin, lo reindirizza alla servlet di login con un messaggio d'errore
+        request.setAttribute("errore", "Accesso negato. Area riservata agli amministratori.");
+        request.getRequestDispatcher("/WEB-INF/view/login.jsp").forward(request, response);
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fishing Lab - Pannello Admin (Dinamico)</title>
+    <title>Fishing Lab - Pannello Admin</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
-        .container { max-width: 650px; background: #fff; margin: 0 auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h2 { color: #0288d1; border-bottom: 2px solid #e1f5fe; padding-bottom: 10px; margin-top: 0; }
-        h3 { color: #f57c00; margin-top: 25px; border-bottom: 1px solid #fff3e0; padding-bottom: 5px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
-        textarea { resize: vertical; height: 80px; }
-        .row { display: flex; gap: 15px; }
-        .row .form-group { flex: 1; }
-        button { background-color: #2e7d32; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 20px; transition: background 0.3s; }
-        button:hover { background-color: #1b5e20; }
+        /* --- VARIABILI E RESET --- */
+        :root {
+            --bg-principal: #0a1118;
+            --bg-card: #111c26;
+            --accento: #00e5ff;
+            --accento-hover: #00b8d4;
+            --testo: #ffffff;
+            --testo-mutato: #8a9cae;
+            --bordo: #1c2d3d;
+            --prezzo: #4caf50;
+            --errore-colore: #ff5252;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-principal);
+            color: var(--testo);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* --- CONTENITORE FORM --- */
+        .admin-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--bordo);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 550px;
+            padding: 40px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .admin-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accento), var(--accento-hover));
+            border-radius: 16px 16px 0 0;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--testo-mutato);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--accento);
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        h2 span {
+            color: var(--accento);
+        }
+
+        .subtitle {
+            color: var(--testo-mutato);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* --- GRUPPI DI INPUT --- */
+        .form-group {
+            margin-bottom: 22px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--testo);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            background-color: #0d1721;
+            border: 1px solid var(--bordo);
+            color: var(--testo);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accento);
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Riga unita per Prezzo e Categoria */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* --- MESSAGGI NOTIFICA --- */
+        .msg-errore {
+            background-color: rgba(255, 82, 82, 0.1);
+            border: 1px solid var(--errore-colore);
+            color: var(--errore-colore);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* --- BOTTONE INVIO --- */
+        .btn-submit {
+            background: var(--accento);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0, 229, 255, 0.2);
+        }
+
+        .btn-submit:hover {
+            background: var(--accento-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 229, 255, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Pannello Amministratore - Fishing Lab</h2>
-    <p>Inserisci un nuovo prodotto. I menu Brand e Categoria sono sincronizzati in tempo reale con il database.</p>
-    
-    <form action="AggiungiProdottoServlet" method="POST">
+    <div class="admin-container">
+        <a href="${pageContext.request.contextPath}/index.jsp" class="back-link">← Torna allo Store</a>
         
-        <h3>1. Informazioni Generali Prodotto</h3>
-        
-        <div class="form-group">
-            <label for="nome">Nome Prodotto:</label>
-            <input type="text" id="nome" name="nomeProdotto" required>
-        </div>
+        <h2>Fishing<span>Lab</span> Panel</h2>
+        <p class="subtitle">Inserisci i dettagli qui sotto per caricare un nuovo prodotto nel database.</p>
 
-        <div class="form-group">
-            <label for="descrizione">Descrizione:</label>
-            <textarea id="descrizione" name="descrizione"></textarea>
-        </div>
+        <%-- Mostra un messaggio di errore se presente --%>
+        <% if (request.getAttribute("errore") != null) { %>
+            <div class="msg-errore">
+                <%= request.getAttribute("errore") %>
+            </div>
+        <% } %>
 
-        <div class="row">
-            <div class="form-group">
-                <label for="prezzoOrig">Prezzo Originale (€):</label>
-                <input type="number" id="prezzoOrig" name="prezzoOriginale" step="0.01" min="0" required>
-            </div>
-            <div class="form-group">
-                <label for="prezzoScont">Prezzo Scontato (€):</label>
-                <input type="number" id="prezzoScont" name="prezzoScontato" step="0.01" min="0">
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="form-group">
-                <label for="brand">Brand / Marca:</label>
-                <select id="brand" name="idBrand" required>
-                    <option value="">-- Seleziona Marchio --</option>
-                    <%
-                        // Connessione diretta al database locale XAMPP
-                        String url = "jdbc:mysql://localhost:3306/fishing_lab_db";
-                        String user = "root";
-                        String password = ""; // Di default su XAMPP è vuota
-                        
-                        Connection conn = null;
-                        Statement stmtBrand = null;
-                        ResultSet rsBrand = null;
-                        
-                        try {
-                            Class.forName("com.mysql.cj.jdbc.Driver");
-                            conn = DriverManager.getConnection(url, user, password);
-                            
-                            stmtBrand = conn.createStatement();
-                            rsBrand = stmtBrand.executeQuery("SELECT ID_Brand, Nome_Brand FROM BRAND ORDER BY Nome_Brand ASC");
-                            
-                            while(rsBrand.next()) {
-                    %>
-                                <option value="<%= rsBrand.getInt("ID_Brand") %>"><%= rsBrand.getString("Nome_Brand") %></option>
-                    <%
-                            }
-                        } catch(Exception e) {
-                            out.println("<option value=''>Errore caricamento brand</option>");
-                        } finally {
-                            if(rsBrand != null) rsBrand.close();
-                            if(stmtBrand != null) stmtBrand.close();
-                        }
-                    %>
-                </select>
-            </div>
+        <form action="${pageContext.request.contextPath}/GestioneProdottiServlet" method="POST">
             
             <div class="form-group">
-                <label for="categoria">Categoria:</label>
-                <select id="categoria" name="idCategoria" required>
-                    <option value="">-- Seleziona Categoria --</option>
-                    <%
-                        Statement stmtCat = null;
-                        ResultSet rsCat = null;
-                        try {
-                            stmtCat = conn.createStatement();
-                            rsCat = stmtCat.executeQuery("SELECT ID_Categoria, Nome_Categoria FROM CATEGORIA ORDER BY Nome_Categoria ASC");
-                            
-                            while(rsCat.next()) {
-                    %>
-                                <option value="<%= rsCat.getInt("ID_Categoria") %>"><%= rsCat.getString("Nome_Categoria") %></option>
-                    <%
-                            }
-                        } catch(Exception e) {
-                            out.println("<option value=''>Errore caricamento categorie</option>");
-                        } finally {
-                            if(rsCat != null) rsCat.close();
-                            if(stmtCat != null) stmtCat.close();
-                            if(conn != null) conn.close(); // Chiudiamo la connessione generale alla fine della pagina
-                        }
-                    %>
-                </select>
+                <label for="nome">Nome del Prodotto</label>
+                <input type="text" id="nome" name="nome" placeholder="Es. Carbon Raptor 2.40m" required>
             </div>
-        </div>
 
-        <div class="form-group" style="width: 48%;">
-            <label for="anno">Anno di Prodotzione:</label>
-            <input type="number" id="anno" name="annoProduzione" min="2020" max="2030" value="2026">
-        </div>
-
-        <h3>2. Dettagli Variante e Magazzino</h3>
-        
-        <div class="row">
             <div class="form-group">
-                <label for="colore">Colore / Estetica:</label>
-                <input type="text" id="colore" name="colore" required>
+                <label for="descrizione">Descrizione</label>
+                <textarea id="descrizione" name="descrizione" placeholder="Inserisci le specifiche tecniche, materiali, dimensioni..." required></textarea>
             </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="prezzo">Prezzo (€)</label>
+                    <input type="number" id="prezzo" name="prezzo" step="0.01" min="0" placeholder="0.00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria">Categoria</label>
+                    <select id="categoria" name="categoria" required>
+                        <option value="" disabled selected>Seleziona...</option>
+                        <option value="Canne">Canne</option>
+                        <option value="Mulinelli">Mulinelli</option>
+                        <option value="Esche">Esche</option>
+                        <option value="Accessori">Accessori</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="form-group">
-                <label for="taglia">Misura / Taglia / Azione:</label>
-                <input type="text" id="taglia" name="misuraTaglia" required>
+                <label for="immagine">Nome File Immagine</label>
+                <input type="text" id="immagine" name="immagine" placeholder="Es. nuova_canna.jpg" required>
+                <span style="color: var(--testo-mutato); font-size: 11px; margin-top: 5px;">
+                    Assicurati che l'immagine sia inserita nella cartella delle risorse del server.
+                </span>
             </div>
-        </div>
 
-        <div class="form-group" style="width: 48%;">
-            <label for="stock">Quantità in Stock:</label>
-            <input type="number" id="stock" name="stockDisponibile" min="0" value="5" required>
-        </div>
-
-        <button type="submit">Salva Articolo nel Database</button>
-    </form>
-</div>
+            <button type="submit" class="btn-submit">Carica Prodotto nel DB</button>
+        </form>
+    </div>
 
 </body>
 </html>

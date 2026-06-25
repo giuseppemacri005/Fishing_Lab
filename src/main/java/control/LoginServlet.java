@@ -25,7 +25,7 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-
+       
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -42,7 +42,7 @@ public class LoginServlet extends HttpServlet {
 
             if (rs.next()) {
                 HttpSession session = request.getSession();
-                session.setAttribute("utenteEmail", rs.getString("email"));
+                session.setAttribute("utenteLoggato", rs.getString("email"));
                 session.setAttribute("utenteRuolo", rs.getString("ruolo"));
                 
                 // Generazione Token di sicurezza nella sessione (richiesto esplicitamente)
