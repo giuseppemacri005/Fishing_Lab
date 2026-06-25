@@ -74,19 +74,19 @@ public class prodottoDAO {
         return p;
     }
 
-    // --- METODO AGGIUNTO PER L'ADMIN: SALVATAGGIO NUOVO PRODOTTO ---
+    // --- METODO DI SALVATAGGIO AGGIORNATO PER L'ADMIN ---
     public void doSave(Prodotto prodotto) throws SQLException {
-        // Query basata sui nomi reali delle colonne emersi dal tuo mapRowToProdotto
-        // Nota: se nel DB hai anche prezzoOriginale, annoProduzione e nomeBrand, aggiungili qui di seguito
-        String sql = "INSERT INTO prodotto (NomeProdotto, Descrizione, PrezzoScontato, Immagine) VALUES (?, ?, ?, ?)";
+        // Inserito PrezzoOriginale richiesto come obbligatorio dal tuo Database
+        String sql = "INSERT INTO prodotto (NomeProdotto, Descrizione, PrezzoOriginale, PrezzoScontato, Immagine) VALUES (?, ?, ?, ?, ?)";
         
         try (Connection con = connessione.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setString(1, prodotto.getNomeProdotto());
             ps.setString(2, prodotto.getDescrizione());
-            ps.setDouble(3, prodotto.getPrezzoScontato());
-            ps.setString(4, prodotto.getImmagine());
+            ps.setDouble(3, prodotto.getPrezzoOriginale()); 
+            ps.setDouble(4, prodotto.getPrezzoScontato());
+            ps.setString(5, prodotto.getImmagine());
 
             ps.executeUpdate();
         }
