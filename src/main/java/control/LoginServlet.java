@@ -24,20 +24,8 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-<<<<<<< HEAD
-       
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            // Utilizzo del DataSource centralizzato
-            conn = connessione.getConnection();
-            
-=======
 
         try (Connection conn = connessione.getConnection()) {
->>>>>>> ca20a713df632e9526b4a7435f0eee1711498df6
             String sql = "SELECT email, ruolo FROM utente WHERE email = ? AND password = ?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, email);
@@ -45,36 +33,31 @@ public class LoginServlet extends HttpServlet {
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         HttpSession session = request.getSession(true);
-                        session.setAttribute("utenteEmail", rs.getString("email"));
-                        session.setAttribute("utenteRuolo", rs.getString("ruolo"));
+                        
+                        String emailDb = rs.getString("email");
+                        String ruoloDb = rs.getString("ruolo");
+
+                        // Salviamo i dati in sessione
+                        session.setAttribute("utenteEmail", emailDb);
+                        session.setAttribute("utenteRuolo", ruoloDb);
+                        // Se la tua index.jsp usa ancora "userSessionKey", scommenta la riga sotto:
+                        // session.setAttribute("userSessionKey", emailDb); 
+                        
                         session.setAttribute("sessionToken", UUID.randomUUID().toString());
 
-<<<<<<< HEAD
-            if (rs.next()) {
-                HttpSession session = request.getSession();
-                session.setAttribute("utenteLoggato", rs.getString("email"));
-                session.setAttribute("utenteRuolo", rs.getString("ruolo"));
-                
-                // Generazione Token di sicurezza nella sessione (richiesto esplicitamente)
-                String sessionToken = UUID.randomUUID().toString();
-                session.setAttribute("sessionToken", sessionToken);
-
-                // Carica la index protetta in /WEB-INF/view/
-                request.getRequestDispatcher("/WEB-INF/view/index.jsp").forward(request, response);
-                return;
-            } else {
-                request.setAttribute("errore", "Email o Password errate!");
-                request.getRequestDispatcher("/WEB-INF/view/login.jsp").forward(request, response);
-                return;
-=======
-                        // REDIRECT alla home: è la HomeServlet che deve caricare i prodotti!
-                        response.sendRedirect(request.getContextPath() + "/home");
+                        // --- LOGICA DI REINDIRIZZAMENTO IN BASE AL RUOLO ---
+                        if (ruoloDb != null && ruoloDb.equalsIgnoreCase("admin")) {
+                            // Se è admin, lo mandiamo DIRETTAMENTE alla pagina di aggiunta prodotti protetta
+                            request.getRequestDispatcher("/WEB-INF/view/aggiunta.jsp").forward(request, response);
+                        } else {
+                            // Se è un cliente, facciamo il REDIRECT alla HomeServlet per caricare il catalogo
+                            response.sendRedirect(request.getContextPath() + "/home");
+                        }
                     } else {
                         request.setAttribute("errore", "Email o Password errate!");
                         request.getRequestDispatcher("/WEB-INF/view/login.jsp").forward(request, response);
                     }
                 }
->>>>>>> ca20a713df632e9526b4a7435f0eee1711498df6
             }
         } catch (Exception e) {
             e.printStackTrace();
