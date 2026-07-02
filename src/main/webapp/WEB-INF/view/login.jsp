@@ -5,57 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fishing Lab - Login</title>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/stile.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/Login.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Sfondo oceanico profondo */
-        body {
-            background: linear-gradient(180deg, #001f3f 0%, #004080 50%, #0066cc 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-            margin: 0;
-        }
-
-        /* Card di login in stile "vetro" moderno */
-        .wave-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            z-index: 10;
-            width: 400px;
-        }
-
-        /* Contenitore delle onde SVG sullo sfondo */
-        .ocean-waves {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 250px;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .wave {
-            animation: wave-anim 12s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
-            transform: translate3d(0, 0, 0);
-        }
-
-        .wave:nth-of-type(2) {
-            animation: wave-anim 8s cubic-bezier(0.36, 0.45, 0.63, 0.53) -.125s infinite;
-            opacity: 0.5;
-        }
-
-        @keyframes wave-anim {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-    </style>
+    
 </head>
 <body>
 
@@ -90,7 +42,7 @@
 </div>
 
 <div class="ocean-waves">
-    <svg viewBox="0 24 150 28" preserveAspectRatio="none" style="width: 200%; height: 100%;">
+    <svg viewBox="0 24 150 28" preserveAspectRatio="none" style="width: 100%; height: 100%;">
         <defs>
             <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s58 18 88 18 58-18 88-18 58 18 88 18v44h-352z" />
         </defs>

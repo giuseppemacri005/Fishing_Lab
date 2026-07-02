@@ -5,107 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fishing Lab - Registrazione</title>
+       
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-dark: #001f3f;
-            --ocean-blue: #0056b3;
-            --sea-foam: #00a8ff;
-        }
-
-        body {
-            background: linear-gradient(135deg, #001220 0%, #002d54 50%, #004b8d 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            margin: 0;
-            padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
-        }
-
-        /* Card con effetto Glassmorphism avanzato */
-        .wave-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-            width: 100%;
-            max-width: 440px;
-            transition: transform 0.3s ease;
-        }
-
-        /* Focus personalizzato sui campi di testo */
-        .form-control {
-            border-radius: 8px;
-            border: 1px solid #ced4da;
-            padding: 10px 12px;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .form-control:focus {
-            border-color: var(--sea-foam);
-            box-shadow: 0 0 0 0.25rem rgba(0, 168, 255, 0.25);
-        }
-
-        /* Bottone moderno */
-        .btn-custom {
-            background-color: var(--primary-dark);
-            color: #ffffff;
-            border-radius: 8px;
-            padding: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .btn-custom:hover {
-            background-color: var(--ocean-blue);
-            color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 86, 179, 0.4);
-        }
-
-        .btn-custom:active {
-            transform: translateY(0);
-        }
-
-        /* Contenitore SVG onde */
-        .ocean-waves {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 150px;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        /* Animazioni differenziate per creare profondità marina */
-        .wave1 {
-            animation: wave-motion 15s linear infinite;
-        }
-        .wave2 {
-            animation: wave-motion-reverse 10s linear infinite;
-            opacity: 0.5;
-        }
-
-        @keyframes wave-motion {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        @keyframes wave-motion-reverse {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
-        }
-    </style>
+      <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/registrazione.css">
+  
+       
 </head>
 <body>
 
