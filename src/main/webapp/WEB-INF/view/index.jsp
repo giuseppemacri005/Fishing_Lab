@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List, model.Prodotto" %>
+<%@ page import="java.util.List, model.Prodotto, model.Utente" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,9 +11,12 @@
 <body>
 
 <%
+    // Recupero carrello
     List<Prodotto> carrello = (List<Prodotto>) session.getAttribute("carrello");
     int count = (carrello != null) ? carrello.size() : 0;
-    String utenteEmail = (String) session.getAttribute("utenteEmail");
+    
+    // Recupero oggetto Utente intero dalla sessione
+    Utente utente = (Utente) session.getAttribute("utente");
 %>
 
 <div class="aquarium">
@@ -35,8 +38,9 @@
             <a class="nav-link text-white" href="${pageContext.request.contextPath}/carrello.jsp">🛒 Carrello 
                 <span id="carrello-badge" class="badge bg-danger rounded-pill"><%= count > 0 ? count : "" %></span>
             </a>
-            <% if (utenteEmail != null) { %>
-                <span class="nav-link text-white fw-bold ms-3">Ciao, <%= utenteEmail %></span>
+            
+            <% if (utente != null) { %>
+                <span class="nav-link text-white fw-bold ms-3">Ciao, <%= utente.getNome() %></span>
                 <a class="btn btn-outline-danger btn-sm ms-3" href="${pageContext.request.contextPath}/LogoutServlet">Logout</a>
             <% } else { %>
                 <a class="btn btn-outline-light btn-sm ms-3" href="${pageContext.request.contextPath}/LoginServlet">Accedi</a>
