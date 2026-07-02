@@ -9,7 +9,7 @@
 <body>
 
 <div class="admin-container">
-    <a href="${pageContext.request.contextPath}/index.jsp" class="back-link">← Torna allo Store</a>
+    <a href="${pageContext.request.contextPath}/home" class="back-link">← Torna allo Store</a>
     <h2>Gestione <span>Prodotti</span></h2>
 
     <form id="adminForm" style="margin-bottom: 40px;">
@@ -39,47 +39,50 @@
 </div>
 
 <script>
-// Questa funzione riempie la tabella usando le chiavi minuscole (p.nome e p.id)
 function caricaProdotti() {
     fetch('${pageContext.request.contextPath}/GestioneProdottiServlet?action=list')
-    .then(res => res.json())
-    .then(data => {
-        const body = document.getElementById('admin-prodotti-body');
-        body.innerHTML = data.map(p => `
-            <tr style="border-bottom: 1px solid #1c2d3d;">
-                <td style="padding:10px;">${p.nome}</td>
-                <td style="padding:10px; text-align: right;">
-                    <button onclick="elimina(${p.id})" style="color:#ff5252; background:none; border:none; cursor:pointer; font-weight:bold;">Elimina</button>
-                </td>
-            </tr>
-        `).join('');
+    .then(function(res) {
+        return res.json();
     })
-    .catch(err => console.error("Errore caricamento prodotti:", err));
+    .then(function(data) {
+        console.log("Dati ricevuti:", data);
+        var body = document.getElementById('admin-prodotti-body');
+        var html = '';
+        
+        data.forEach(function(p) {
+            html += '<tr style="border-bottom: 1px solid #1c2d3d;">';
+            html += '<td style="padding:10px; color: white;">' + p.nome + '</td>';
+            html += '<td style="padding:10px; text-align: right;">';
+            html += '<button onclick="elimina(' + p.id + ')" style="color:#ff5252; background:none; border:none; cursor:pointer; font-weight:bold;">Elimina</button>';
+            html += '</td></tr>';
+        });
+        
+        body.innerHTML = html;
+    })
+    .catch(function(err) {
+        console.error("Errore nel caricamento:", err);
+    });
 }
 
-// Chiamata per eliminare
 function elimina(id) {
     if(confirm('Sei sicuro di voler eliminare questo prodotto?')) {
-        // Usiamo la action=delete e passiamo l'id
         fetch('${pageContext.request.contextPath}/GestioneProdottiServlet?action=delete&id=' + id, { method: 'POST' })
-        .then(() => caricaProdotti());
+        .then(function() { caricaProdotti(); });
     }
 }
 
-// Gestione invio form
 document.getElementById('adminForm').addEventListener('submit', function(e) {
     e.preventDefault();
     fetch('${pageContext.request.contextPath}/GestioneProdottiServlet', { 
         method: 'POST', 
         body: new URLSearchParams(new FormData(this)) 
     })
-    .then(() => { 
-        this.reset(); 
+    .then(function() { 
+        document.getElementById('adminForm').reset(); 
         caricaProdotti(); 
     });
 });
 
-// Caricamento iniziale
 caricaProdotti();
 </script>
 </body>
